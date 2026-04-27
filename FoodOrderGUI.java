@@ -82,8 +82,12 @@ public class FoodOrderGUI extends JFrame {
         JButton btnMenu = new GradientButton("Lihat Menu", greenLight, green);
         JButton btnCart = new GradientButton("Lihat Keranjang", greenLight, green);
         JButton btnPay = new GradientButton("Bayar", greenLight, green);
-        JButton historyButton = new GradientButton("Riwayat Pembelian", green, greenLight);
 
+        Color gray = new Color(128, 128, 128);
+        Color arsenik = new Color(59, 68, 75);
+        
+        // JButton historyButton = new GradientButton("Riwayat Pembelian", green, greenLight);
+        JButton historyButton = new GradientButton("Riwayat Pembelian", gray, arsenik);
         btnMenu.setFont(tombolFont);
         btnCart.setFont(tombolFont);
         btnPay.setFont(tombolFont);

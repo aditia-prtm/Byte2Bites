@@ -15,7 +15,7 @@ public class MenuService {
                 "resources/image/ayamgeprek.png"));
         menu.add(new MenuItem("SuSuSu", 4000, "resources/image/sususu.png"));
         menu.add(new MenuItem("Donut FKIP", 10000, "resources/image/donut.jpg"));
-        menu.add(new MenuItem("Angin FASILKOM", 999999, "resources/image/ngin.png"));
+        menu.add(new MenuItem("Angin FASILKOM", 999999, "resources/image/angin.png"));
     }
 
     public ArrayList<MenuItem> getMenu() {
