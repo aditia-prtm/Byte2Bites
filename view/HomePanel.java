@@ -48,7 +48,7 @@ public class HomePanel extends JPanel {
         JButton btnMenu = new GradientButton("Lihat Menu", greenLight, green);
         JButton btnCart = new GradientButton("Lihat Keranjang", greenLight, green);
         JButton btnPay = new GradientButton("Bayar", greenLight, green);
-        JButton historyButton = new GradientButton("Riwayat Pembelian", gray, arsenik);
+        JButton historyButton = new GradientButton("Riwayat Pembelian", green, greenLight);
 
         Font tombolFont = new Font("Basketball", Font.PLAIN, 18);
         btnMenu.setFont(tombolFont);
