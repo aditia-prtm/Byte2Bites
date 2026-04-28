@@ -45,7 +45,7 @@ public class FoodOrderApp extends JFrame {
         this.purchaseHistory = new ArrayList<>();
 
         setTitle("BYTE2BITES - Project Kelompok 2");
-        setSize(600, 520);
+        setSize(500, 520);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
