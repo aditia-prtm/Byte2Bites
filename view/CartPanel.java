@@ -1,10 +1,12 @@
+package view;
 
 import model.Cart;
 import model.CartItem;
 import model.MenuItem;
 import service.SoundService;
-
 import javax.swing.*;
+
+import main.FoodOrderApp;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -23,11 +25,14 @@ public class CartPanel extends JPanel {
         this.app = app;
         this.cart = cart;
         this.soundService = soundService;
+        initUI();
+    }
 
+    private void initUI() {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Panel untuk daftar item
+        // Panel daftar item
         cartListPanel = new JPanel();
         cartListPanel.setLayout(new GridLayout(0, 1, 10, 10));
 
@@ -35,7 +40,7 @@ public class CartPanel extends JPanel {
         cartScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         cartScroll.getVerticalScrollBar().setUnitIncrement(8);
 
-        // Panel bawah (Total + Tombol)
+        // Bottom Panel (Total + Tombol)
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 0));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
 
@@ -45,14 +50,8 @@ public class CartPanel extends JPanel {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
 
-        JButton backButton = new JButton("Kembali");
-        backButton.setFont(new Font("Basketball", Font.PLAIN, 18));
-        style(backButton, Color.GRAY);
-
-        clearCartButton = new JButton("Kosongkan Keranjang");
-        clearCartButton.setFont(new Font("Basketball", Font.PLAIN, 16));
-        clearCartButton.setBackground(new Color(220, 53, 69));
-        clearCartButton.setForeground(Color.WHITE);
+        JButton backButton = createStyledButton("Kembali", Color.GRAY, 18);
+        clearCartButton = createStyledButton("Kosongkan Keranjang", new Color(220, 53, 69), 16);
 
         buttonPanel.add(backButton);
         buttonPanel.add(clearCartButton);
@@ -60,7 +59,7 @@ public class CartPanel extends JPanel {
         bottomPanel.add(totalLabel, BorderLayout.CENTER);
         bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Tambahkan ke layout utama
+        // Tambah ke layout utama
         add(cartScroll, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -69,9 +68,6 @@ public class CartPanel extends JPanel {
         clearCartButton.addActionListener(e -> clearCart());
     }
 
-    /**
-     * Refresh tampilan keranjang (dipanggil saat masuk ke halaman cart)
-     */
     public void refreshCart() {
         cartListPanel.removeAll();
 
@@ -93,7 +89,6 @@ public class CartPanel extends JPanel {
 
     private JPanel createCartItemPanel(CartItem ci) {
         MenuItem m = ci.getItem();
-
         JPanel itemPanel = new JPanel(new BorderLayout(10, 5));
         itemPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.GRAY, 1),
@@ -102,12 +97,12 @@ public class CartPanel extends JPanel {
         itemPanel.setBackground(new Color(245, 245, 245));
         itemPanel.setPreferredSize(new Dimension(300, 130));
 
-        // Gambar
+        // Image
         ImageIcon rawFood = new ImageIcon(m.getImagePath());
         Image scaled = rawFood.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
         JLabel imgLabel = new JLabel(new ImageIcon(scaled));
 
-        // Nama dan Harga
+        // Text
         JLabel nameLabel = new JLabel(m.getName());
         nameLabel.setFont(new Font("Basketball", Font.PLAIN, 18));
 
@@ -120,11 +115,9 @@ public class CartPanel extends JPanel {
         textPanel.add(nameLabel);
         textPanel.add(priceLabel);
 
-        // Spinner Quantity
-        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(ci.getQuantity(), 1, 999, 1);
-        JSpinner quantitySpinner = new JSpinner(spinnerModel);
+        // Quantity Spinner
+        JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(ci.getQuantity(), 1, 999, 1));
         quantitySpinner.setPreferredSize(new Dimension(70, 30));
-
         quantitySpinner.addChangeListener(e -> {
             ci.setQuantity((int) quantitySpinner.getValue());
             priceLabel.setText("Rp " + m.getPrice() + " x " + ci.getQuantity() + " = Rp " + ci.getTotalPrice());
@@ -135,17 +128,14 @@ public class CartPanel extends JPanel {
         spinnerPanel.setOpaque(false);
         spinnerPanel.add(quantitySpinner);
 
-        // Tombol Hapus
-        JButton removeBtn = new JButton("Hapus");
-        removeBtn.setFont(new Font("Basketball", Font.PLAIN, 14));
-        removeBtn.setBackground(new Color(220, 53, 69));
-        removeBtn.setForeground(Color.WHITE);
+        // Remove Button
+        JButton removeBtn = createStyledButton("Hapus", new Color(220, 53, 69), 14);
         removeBtn.addActionListener(e -> {
             cart.getItems().remove(ci);
             refreshCart();
         });
 
-        // Susun layout item
+        // Susun layout
         itemPanel.add(imgLabel, BorderLayout.WEST);
         itemPanel.add(textPanel, BorderLayout.CENTER);
         itemPanel.add(spinnerPanel, BorderLayout.EAST);
@@ -161,10 +151,14 @@ public class CartPanel extends JPanel {
     }
 
     private void clearCart() {
+        if(cart.getItems().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Keranjang sudah kosong!", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Apakah Anda yakin ingin mengosongkan keranjang?",
-                "Konfirmasi",
-                JOptionPane.YES_NO_OPTION);
+                "Konfirmasi", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
             cart.clear();
@@ -172,8 +166,11 @@ public class CartPanel extends JPanel {
         }
     }
 
-    private void style(JButton b, Color c) {
-        b.setBackground(c);
-        b.setForeground(Color.WHITE);
+    private JButton createStyledButton(String text, Color bgColor, int fontSize) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Basketball", Font.PLAIN, fontSize));
+        btn.setBackground(bgColor);
+        btn.setForeground(Color.WHITE);
+        return btn;
     }
 }

@@ -1,7 +1,11 @@
+package view;
+
 
 import model.PurchaseRecord;
 
 import javax.swing.*;
+
+import main.FoodOrderApp;
 
 import java.awt.*;
 import java.io.File;
@@ -12,6 +16,10 @@ public class HomePanel extends JPanel {
 
     public HomePanel(FoodOrderApp app) {
         this.app = app;
+        initUI();
+    }
+
+    private void initUI() {
         setLayout(new GridLayout(7, 1, 0, 10));
         setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
 
@@ -20,41 +28,35 @@ public class HomePanel extends JPanel {
         Color gray = new Color(128, 128, 128);
         Color arsenik = new Color(59, 68, 75);
 
-        Font tombolFont = new Font("Basketball", Font.PLAIN, 18);
-
         // Logo
         ImageIcon rawLogo = new ImageIcon(app.getIconService().getIcon());
         Image scaledLogo = rawLogo.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo), SwingConstants.CENTER);
 
+        // Title
         JLabel title = new JLabel("BYTE2BITES", SwingConstants.CENTER);
         title.setForeground(green);
         title.setBorder(BorderFactory.createEmptyBorder(-20, 0, -30, 0));
+        setCustomFont(title, "font/Angels.ttf", 39f);
 
-        try {
-            title.setFont(Font.createFont(Font.TRUETYPE_FONT, new File("font/Angels.ttf")).deriveFont(39f));
-        } catch (Exception e) {
-            title.setFont(new Font("Arial", Font.BOLD, 39));
-        }
-
+        // Subtitle
         JLabel subtitle = new JLabel("Silahkan order makananmu!", SwingConstants.CENTER);
         subtitle.setForeground(green);
-        try {
-            subtitle.setFont(Font.createFont(Font.TRUETYPE_FONT, new File("font/Basketball.otf")).deriveFont(14f));
-        } catch (Exception e) {
-            subtitle.setFont(new Font("Arial", Font.PLAIN, 14));
-        }
+        setCustomFont(subtitle, "font/Basketball.otf", 14f);
 
+        // Buttons
         JButton btnMenu = new GradientButton("Lihat Menu", greenLight, green);
         JButton btnCart = new GradientButton("Lihat Keranjang", greenLight, green);
         JButton btnPay = new GradientButton("Bayar", greenLight, green);
         JButton historyButton = new GradientButton("Riwayat Pembelian", gray, arsenik);
 
+        Font tombolFont = new Font("Basketball", Font.PLAIN, 18);
         btnMenu.setFont(tombolFont);
         btnCart.setFont(tombolFont);
         btnPay.setFont(tombolFont);
         historyButton.setFont(tombolFont);
 
+        // Tambahkan ke panel
         add(historyButton);
         add(logoLabel);
         add(title);
@@ -70,30 +72,42 @@ public class HomePanel extends JPanel {
         historyButton.addActionListener(e -> showHistory());
     }
 
+    private void setCustomFont(JLabel label, String fontPath, float size) {
+        try {
+            label.setFont(Font.createFont(Font.TRUETYPE_FONT, new File(fontPath)).deriveFont(size));
+        } catch (Exception e) {
+            label.setFont(new Font("Arial", Font.BOLD, (int) size));
+        }
+    }
+
     private void handlePayButton() {
         if (app.getCart().getItems().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Keranjang masih kosong!", "Tidak Bisa Bayar", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Keranjang masih kosong!", 
+                "Tidak Bisa Bayar", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         String input = JOptionPane.showInputDialog(this, "Masukkan jarak rumah ke toko (km):");
-        if (input == null || input.isEmpty()) return;
+        if (input == null || input.trim().isEmpty()) return;
 
         try {
-            double km = Double.parseDouble(input);
-            if (km < 0) return;
-
+            double km = Double.parseDouble(input.trim());
+            if (km < 0) throw new NumberFormatException();
+            
             app.setShippingCost(km * 2000);
             app.showPanel("pay");
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Input harus angka positif!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Input harus angka non-negatif!", 
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void showHistory() {
         if (app.getPurchaseHistory().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Anda belum pernah melakukan pembelian!", 
-                "History Information", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, 
+                "Anda belum pernah melakukan pembelian!",
+                "Riwayat Pembelian", 
+                JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -102,6 +116,7 @@ public class HomePanel extends JPanel {
         historyFrame.setLocationRelativeTo(this);
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
+        
         for (PurchaseRecord pr : app.getPurchaseHistory()) {
             listModel.addElement(pr.getDate() + " - " + pr.getItemName() +
                     " (" + pr.getQuantity() + "x) : Rp" + (pr.getPrice() * pr.getQuantity()));
